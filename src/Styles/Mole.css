@@ -1,0 +1,65 @@
+.mole-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 10px;
+  cursor: none;
+}
+
+.mole-hole {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 40%;
+  background-image: url('/assets/images/hole.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: bottom;
+  z-index: 1;
+  cursor: none;
+}
+
+.mole {
+  position: absolute;
+  bottom: 0;
+  width: 80%;
+  height: 80%;
+  left: 10%;
+  transition: transform 0.2s ease-in-out;
+  z-index: 2;
+  background-image: url('/assets/images/mole.png');
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  background-position: bottom;
+  cursor: none;
+}
+
+/* Animation states */
+.mole.hidden {
+  transform: translateY(100%);
+
+}
+
+.mole.visible {
+  transform: translateY(0);
+}
+
+.mole.whacked {
+  transform: translateY(30%);
+  background-image: url('/assets/images/mole-whacked.png');
+  
+}
+
+/* Add some hover effect for better user experience */
+.mole.visible:hover {
+  transform: translateY(-5%);
+}
+
+/* Media query for smaller screens */
+@media (max-width: 480px) {
+  .mole-container {
+    width: 80px;
+    height: 80px;
+    margin: 5px;
+  }
+}
