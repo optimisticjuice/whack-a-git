@@ -3,7 +3,7 @@ import { initialState } from "./GameConstants";
 import { GameContext } from "./GameContextDefinition"; 
 
 function gameReducer(state, action){
-    const {gameDuration, status, timer, score, highScores, difficulty } = {state};
+    const {gameDuration, status, timer, score} = {state};
     switch(action.type){
         case "START_GAME":
             return {...state, 
@@ -17,6 +17,10 @@ function gameReducer(state, action){
                 status: "paused"
             }    
             // When the game is paused, the timer is paused
+        case "RESET_GAME":
+            return initialState;
+            default : 
+            return state;
     }
 }
 

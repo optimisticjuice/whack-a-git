@@ -1,6 +1,6 @@
-export const intialState = {
+export const initialState = {
     score: 0, /* Score */
-    status:"waiting", /* Game status */
+    status:"paused", /* Game status */
     timer: 0, /* Timer */
     difficulty: "easy", /* Game difficulty */
     gameDuration: 40, /* Game duration */

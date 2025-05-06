@@ -1,14 +1,13 @@
-import "../Styles/App.css";
-import "../Styles/WhackAMole.css";
-import "../Styles/CustomCursor.css";
-import { useEffect } from "react";
-import MoleGrid from './Components/MoleGrid';
-import CustomCursor from "./Components/CustomCursor";
+import GameControls from "./Components/GameControls.jsx";
+
+
+import { GameProvider } from "./Context/GameContext";
 
 function App(){
   return (
-    <>
-    </>
+    <GameProvider>
+      <GameControls/>
+    </GameProvider>
   )
 }
 
