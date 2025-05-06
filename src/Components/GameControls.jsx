@@ -1,0 +1,1 @@
+import "../Styles/GameControls.css";
