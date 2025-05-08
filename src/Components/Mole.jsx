@@ -1,30 +1,36 @@
 import "../Styles/Mole.css";
-import { GameContext } from "../Context/GameContextDefinition.jsx";
-import { useContext } from "react";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const Mole = ({onWhack}) => {
-    const {state} = useContext(GameContext);
+const Mole = ({onWhack, moleIndex, isActive}) => {
+    
     const [mode, setMode] = useState("hidden");
-    const {status} = {state};
+   
     useEffect(() => {
-        if(status !== "whacked"){
-            // IF teh mole is not whacked, make it visible
+        if(isActive && mode !== "whacked"){
+            // IF the mole is not whacked, make it visible
             setMode("visible");
-        }else if(status === "whacked"){
+        }else if(!isActive && mode !== "whacked"){
+            // Hide the mole that is not active and is not whacked.
             setMode("hidden"); 
-            // switch the whacked to state.status !== "whacked"
-            //! Fix later
         }
-    }, [status]);
+    }, [mode, isActive]);
 
     const handleClick = () => {
-      if(status === "visible"){
-        onWhack();
+      if(mode === "visible"){
+        onWhack(moleIndex);
         // Later add the moleIndex here for the specific mole that is going to be whacked.
         setMode("whacked");
+        // Once the mole is clicked if  whacked mole for 3 seconds 
+        setTimeout(() => {
+            if(isActive){
+                setMode("visible");
+            }else{
+                setMode("hidden");
+            }
+        }, 3000);
+
       }
+    //   Once the mole is clicked if  whacked mole for 3 seconds 
     };
 
     return (

@@ -73,7 +73,7 @@ const MoleGrid = () => {
         }
         // This is the interval in which the moles will pop up. 
         setInterval(() => {
-            
+         
         }, currentSettings.moleAppearanceRate);
     }, [currentSettings, status])
 
@@ -87,7 +87,7 @@ const MoleGrid = () => {
                 <div className="moles-row-top">
                     {/* The 3 top moles were added to the ui */}
                     {Array(3).fill().map((_, index) => (
-                        <Mole key={index} isActive={activeMoles[index]} onWhack={handleWhack}/>
+                        <Mole key={index} moleIndex={index} isActive={activeMoles[index]} onWhack={handleWhack}/>
                     ))}
                 </div>
                 
