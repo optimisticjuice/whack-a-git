@@ -21,6 +21,15 @@ function gameReducer(state, action){
             return initialState;
             default : 
             return state;
+        case "SET_DIFFICULTY":
+            return {...state, 
+                difficulty: action.payload
+            };
+        case "DECREMENT_TIMER":
+            return {...state, 
+                
+            };
+            // When the difficulty is changed it moves from the GameControls 
     }
 }
 
