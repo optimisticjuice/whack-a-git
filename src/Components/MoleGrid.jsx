@@ -40,6 +40,7 @@ const MoleGrid = () => {
                 newActiveMoles[index] = false;
                 return newActiveMoles;
             })
+            // The setActiveMoles will set the true to false of the mole that was whacked so that the mole that is whacked is now hidden(false).
         }
     }, [dispatch, status])
 
@@ -66,8 +67,15 @@ const MoleGrid = () => {
 
 
     useEffect(() => {
-        
-    }, [currentSettings])
+        if(status !== "playing"){
+            setActiveMoles(Array(9).fill(false));
+            return;
+        }
+        // This is the interval in which the moles will pop up. 
+        setInterval(() => {
+            
+        }, currentSettings.moleAppearanceRate);
+    }, [currentSettings, status])
 
 
     return (

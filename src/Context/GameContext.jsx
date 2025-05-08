@@ -27,9 +27,9 @@ function gameReducer(state, action){
             };
         case "DECREMENT_TIMER":
             return {...state, 
-                
+                timer: timer - 1
             };
-            // When the difficulty is changed it moves from the GameControls 
+            // The timer is decremented by 1 every second.
     }
 }
 
