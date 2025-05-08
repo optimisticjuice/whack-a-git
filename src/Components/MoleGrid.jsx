@@ -10,6 +10,7 @@ const MoleGrid = () => {
     const {score, timer, status, gameDuration, difficulty} = state;
     const [activeMoles, setActiveMoles] = useState(Array(9).fill(false));  
     const timerInterval = useRef(null);
+    const moleAppearanceInterval = useRef(null);
     // using the useMemo with the difficulty settings to prevent re-rendering and to select the difficulty settings when neccessary.
     const difficultySettings = useMemo(() => ({
         easy:{
@@ -67,14 +68,17 @@ const MoleGrid = () => {
 
 
     useEffect(() => {
+        // This is the interval in which the moles will pop up. 
+        moleAppearanceInterval.current = setInterval(() => {
+            
+        }, currentSettings.moleAppearanceRate);
+        
+        
         if(status !== "playing"){
             setActiveMoles(Array(9).fill(false));
+            clearInterval(moleAppearanceInterval.current);
             return;
         }
-        // This is the interval in which the moles will pop up. 
-        setInterval(() => {
-         
-        }, currentSettings.moleAppearanceRate);
     }, [currentSettings, status])
 
 
