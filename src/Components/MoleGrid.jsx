@@ -4,6 +4,7 @@ import { useContext, useMemo, useCallback, useState, useEffect, useRef } from "r
 import GameStats from "./GameStats.jsx";
 import GameControls from "./GameControls.jsx";
 import Mole from "./Mole.jsx";
+import GameMusic from "../Hooks/GameLogic";
 
 const MoleGrid = () => {
     const {state, dispatch} = useContext(GameContext);
@@ -11,6 +12,7 @@ const MoleGrid = () => {
     const [activeMoles, setActiveMoles] = useState(Array(9).fill(false));  
     const timerInterval = useRef(null);
     const moleAppearanceInterval = useRef(null);
+    const {backgroundMusicRef} = GameMusic();
     // using the useMemo with the difficulty settings to prevent re-rendering and to select the difficulty settings when neccessary.
     const difficultySettings = useMemo(() => ({
         easy:{
@@ -31,22 +33,6 @@ const MoleGrid = () => {
     }),[])
 
     const currentSettings = useMemo(() => difficultySettings[difficulty], [difficulty, difficultySettings])
-    // leave it until needed for now.
-    const handleWhack = useCallback((index) =>{
-        if(status === 'playing'){
-            dispatch({type: "INCREMENT_SCORE", payload: 1});
-            // Increment the score by 1 everytime the mole is whacked 
-            setActiveMoles(prev =>{
-                const newActiveMoles = [...prev];
-                newActiveMoles[index] = false;
-                return newActiveMoles;
-            })
-            // The setActiveMoles will set the true to false of the mole that was whacked so that the mole that is whacked is now hidden(false).
-        }
-    }, [dispatch, status])
-
-    
-    
     
     //  Start the game timer  and set the gameDuration in motion.
     useEffect(() => {
@@ -63,9 +49,42 @@ const MoleGrid = () => {
             // pause the game whilst it is not playing.
         }
         return () => clearInterval(timerInterval.current);
-    }, [dispatch, status, timer, gameDuration])
+    }, [dispatch, status, timer, gameDuration]);
 
 
+    
+    useEffect(() => {// This useEffect is for the background music 
+        if(status === "playing" && backgroundMusicRef.current){
+            backgroundMusicRef.current.play().catch(error =>{
+                console.error("Failed to play background music", error);
+                // condition to play music in the background else set an error condition.
+            });
+        }else if((status === "paused") && backgroundMusicRef.current){
+            backgroundMusicRef.current.pause();
+            // condition to pause the music when the game is paused.
+        }
+        if((status === "ended") && backgroundMusicRef.current){
+            backgroundMusicRef.current.currentTime = 0;
+            backgroundMusicRef.current.pause();
+            // condition to reset the music when the game is ended.
+        }
+    }, [status, backgroundMusicRef])
+    
+    const handleWhack = useCallback((index) =>{
+        if(status === 'playing'){
+            dispatch({type: "INCREMENT_SCORE", payload: 1});
+            // Increment the score by 1 everytime the mole is whacked 
+            setActiveMoles(prev =>{
+                const newActiveMoles = [...prev];
+                newActiveMoles[index] = false;
+                return newActiveMoles;
+            })
+            // The setActiveMoles will set the true to false of the mole that was whacked so that the mole that is whacked is now hidden(false).
+        }
+    }, [dispatch, status])
+    
+
+    
     useEffect(() => {
         // This is the interval in which the moles will pop up. 
         moleAppearanceInterval.current = setInterval(() => {
