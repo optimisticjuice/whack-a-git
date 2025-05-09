@@ -5,6 +5,7 @@ import GameStats from "./GameStats.jsx";
 import GameControls from "./GameControls.jsx";
 import Mole from "./Mole.jsx";
 import GameMusic from "../Hooks/GameLogic";
+import GameResult from "./GameResult.jsx";
 
 const MoleGrid = () => {
     const {state, dispatch} = useContext(GameContext);
@@ -13,6 +14,7 @@ const MoleGrid = () => {
     const timerInterval = useRef(null);
     const moleAppearanceInterval = useRef(null);
     const {backgroundMusicRef} = GameMusic();
+    const gameEndSoundRef = useRef(new Audio("/assets/sounds/game-over.mp3"));
     // using the useMemo with the difficulty settings to prevent re-rendering and to select the difficulty settings when neccessary.
     const difficultySettings = useMemo(() => ({
         easy:{
@@ -37,6 +39,9 @@ const MoleGrid = () => {
     //  Start the game timer  and set the gameDuration in motion.
     useEffect(() => {
         if(status === "playing" && timer === 0){
+            gameEndSoundRef.current.play().catch(error => {
+                console.error("Failed to play game over sound", error);
+            });
             dispatch({type: "END_GAME"});
             dispatch({type: "SET_TIMER", payload: gameDuration});
         }
@@ -76,7 +81,34 @@ const MoleGrid = () => {
     useEffect(() => {
         // This is the interval in which the moles will pop up. 
         moleAppearanceInterval.current = setInterval(() => {
-            
+            setActiveMoles(prev => {
+                const newActiveMoles = [...prev];
+                const activeCount = newActiveMoles.filter(Boolean).length;
+                
+                if(activeCount >= currentSettings.moleActiveMoles){
+                    return newActiveMoles;
+                }
+                const availableHoles = newActiveMoles.map((active, index) => ({active,index})).filter(hole => !hole.active).map(hole => hole.index);
+
+                if (availableHoles.length > 0) {
+
+                    const randomIndex = Math.floor(Math.random() * availableHoles.length);
+                    const selectedHole = availableHoles[randomIndex];
+                    newActiveMoles[selectedHole] = true;
+
+                    setTimeout(() => {
+                        setActiveMoles(current => {
+                            const updated = [...current];
+                            updated[selectedHole] = false;
+                            return updated;
+                        })
+                    }, currentSettings.moleShowTime);
+                }
+                
+                return newActiveMoles;
+                
+            })
+            return () => clearInterval(moleAppearanceInterval.current);
         }, currentSettings.moleAppearanceRate);
         
         
@@ -85,6 +117,8 @@ const MoleGrid = () => {
             clearInterval(moleAppearanceInterval.current);
             return;
         }
+        return () => clearInterval(moleAppearanceInterval.current);
+
     }, [currentSettings, status])
 
 
@@ -121,6 +155,19 @@ const MoleGrid = () => {
                         <Mole key={index} moleIndex={index} isActive={activeMoles[index]} onWhack={handleWhack}/>
                     ))}
                 </div>
+                <div className="moles-row-middle">
+                    {/* The 3 middle moles were added to the ui */}
+                    {Array(3).fill().map((_, index) => (
+                        <Mole key={index + 3} moleIndex={index + 3} isActive={activeMoles[index + 3]} onWhack={handleWhack}/>
+                    ))}
+                </div>
+                <div className="moles-row">
+                    {/* The 3 bottom moles were added to the ui */}
+                    {Array(3).fill().map((_, index) => (
+                        <Mole key={index + 6} moleIndex={index + 6} isActive={activeMoles[index + 6]} onWhack={handleWhack}/>
+                    ))}
+                </div>
+               
                 
             </div>
             {/* The GameControls component was added to the ui */}
