@@ -70,18 +70,6 @@ const MoleGrid = () => {
         }
     }, [status, backgroundMusicRef])
     
-    const handleWhack = useCallback((index) =>{
-        if(status === 'playing'){
-            dispatch({type: "INCREMENT_SCORE", payload: 1});
-            // Increment the score by 1 everytime the mole is whacked 
-            setActiveMoles(prev =>{
-                const newActiveMoles = [...prev];
-                newActiveMoles[index] = false;
-                return newActiveMoles;
-            })
-            // The setActiveMoles will set the true to false of the mole that was whacked so that the mole that is whacked is now hidden(false).
-        }
-    }, [dispatch, status])
     
 
     
@@ -100,6 +88,19 @@ const MoleGrid = () => {
     }, [currentSettings, status])
 
 
+    const handleWhack = useCallback((index) =>{
+        if(status === 'playing'){
+            dispatch({type: "INCREMENT_SCORE", payload: 1});
+            // Increment the score by 1 everytime the mole is whacked 
+            setActiveMoles(prev =>{
+                const newActiveMoles = [...prev];
+                newActiveMoles[index] = false;
+                return newActiveMoles;
+            })
+            // The setActiveMoles will set the true to false of the mole that was whacked so that the mole that is whacked is now hidden(false).
+        }
+    }, [dispatch, status])
+    
 
     const RenderGameResult = () => {
             if(status === "ended"){
