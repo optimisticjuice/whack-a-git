@@ -124,6 +124,7 @@ const MoleGrid = () => {
             </div>
             {/* The GameControls component was added to the ui */}
             <GameControls/>
+            {RenderGameResult()}
         </div>
     )
 }
