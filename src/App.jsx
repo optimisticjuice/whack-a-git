@@ -3,19 +3,19 @@ import MoleGrid from "./Components/MoleGrid.jsx";
 
 import { GameProvider } from "./Context/GameContext";
 
-const GameContent = () => {
-    return (
-        <>
-            <MoleGrid/>
+// const GameContent = () => {
+//     return (
+//         <>
+            
            
-        </>
-    )
-}
+//         </>
+//     )
+// }
 function App(){
   return (
     <GameProvider>
+      <MoleGrid/>
       
-      <GameContent/>
     </GameProvider>
   )
 }

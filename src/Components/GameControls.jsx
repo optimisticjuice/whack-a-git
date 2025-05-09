@@ -10,9 +10,8 @@ const GameControls = () => {
     const handleStartGame = () => {
         if(status === "ended"){
             dispatch({type: "RESET_GAME"});
-        }else{
-            dispatch({type: "START_GAME"});
         }
+        dispatch({type: "START_GAME"});
     };
 
     const handlePauseGame = () => {
@@ -25,10 +24,11 @@ const GameControls = () => {
     const handleDifficultyChange = (e) => {
         dispatch({type: "SET_DIFFICULTY", payload: e.target.value});
     };
+    // handleDifficultyChange function is used to change the difficulty of the game via the payload e.target.value.
     return(
         <div className="game-controls">
          <div className="buttons">
-            <button onClick={handleStartGame} disabled={status === "playing" || status === "paused"}>{status === "ended" ? "Restart Game" : "Start Game"} </button>
+            <button onClick={handleStartGame} disabled={status === "playing"}>{status === "ended" ? "Restart Game" : "Start Game"} </button>
            {/* handleStartGame function inside the onClick inside the button disabled when playing or paused. */}
            <button onClick={handlePauseGame} disabled={status === "paused"}>{status === "playing" ? "Pause Game" : "Resume Game"}</button>
          </div>  
@@ -40,7 +40,7 @@ const GameControls = () => {
             {/* difficulty options */}
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
+            <option value="difficult">Difficult</option>
             </select>
          </div>      
         </div>

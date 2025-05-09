@@ -3,7 +3,9 @@ import { initialState } from "./GameConstants";
 import { GameContext } from "./GameContextDefinition"; 
 
 function gameReducer(state, action){
-    const {gameDuration, status, timer, score} = {state};
+    const {gameDuration, status, timer, score} = state;
+    // note to self no brackets on the state when destructuring.
+    // when destructuring the right hand side of the equation does NOT require brackets.
     switch(action.type){
         case "START_GAME":
             return {...state, 
@@ -17,19 +19,27 @@ function gameReducer(state, action){
                 status: "paused"
             }    
             // When the game is paused, the timer is paused
-        case "RESET_GAME":
-            return initialState;
-            default : 
-            return state;
-        case "SET_DIFFICULTY":
-            return {...state, 
-                difficulty: action.payload
-            };
-        case "DECREMENT_TIMER":
-            return {...state, 
-                timer: timer - 1
-            };
-            // The timer is decremented by 1 every second.
+            case "SET_DIFFICULTY":
+                return {...state, 
+                    difficulty: action.payload
+                };
+                case "DECREMENT_TIMER":
+                    return {...state, 
+                        timer: timer - 1
+                    };
+                    case "SET_TIMER":
+                        return {...state,
+                            timer: action.payload
+                        }
+                        // The timer is decremented by 1 every second.
+                        case "END_GAME":
+                            return {...state,
+                                status: "ended"
+                            }
+                    case "RESET_GAME":
+                            return initialState;
+                    default:
+                        return state;
     }
 }
 

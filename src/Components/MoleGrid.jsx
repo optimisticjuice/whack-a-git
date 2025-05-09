@@ -51,7 +51,8 @@ const MoleGrid = () => {
     //  Start the game timer  and set the gameDuration in motion.
     useEffect(() => {
         if(status === "playing" && timer === 0){
-            dispatch({type: "SET_TIMER", payload: gameDuration})
+            dispatch({type: "END_GAME"});
+            dispatch({type: "SET_TIMER", payload: gameDuration});
         }
         if(status === "playing" && timer > 0){
             timerInterval.current = setInterval(() =>{
@@ -61,9 +62,7 @@ const MoleGrid = () => {
             clearInterval(timerInterval.current);
             // pause the game whilst it is not playing.
         }
-        return () => {
-            clearInterval(timerInterval.current);
-        }
+        return () => clearInterval(timerInterval.current);
     }, [dispatch, status, timer, gameDuration])
 
 
