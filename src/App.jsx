@@ -1,21 +1,17 @@
-import GameControls from "./Components/GameControls.jsx";
 import MoleGrid from "./Components/MoleGrid.jsx";
-
+import {CursorFollow, CustomCursor} from "./Components/CustomCursor.jsx";
 import { GameProvider } from "./Context/GameContext";
+import { useEffect } from "react";
 
-// const GameContent = () => {
-//     return (
-//         <>
-            
-           
-//         </>
-//     )
-// }
+
 function App(){
+  useEffect(() => {
+    CursorFollow();
+  }, []);
   return (
     <GameProvider>
       <MoleGrid/>
-      
+      <CustomCursor/>
     </GameProvider>
   )
 }

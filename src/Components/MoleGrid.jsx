@@ -100,6 +100,14 @@ const MoleGrid = () => {
     }, [currentSettings, status])
 
 
+
+    const RenderGameResult = () => {
+            if(status === "ended"){
+            return(
+                <GameResult score={score}/>
+            )
+        }
+    }
     return (
         <div className="game-container">
             <GameStats score={score} timer={timer}/>
