@@ -70,7 +70,10 @@ const Mole = ({onWhack, moleIndex, isActive}) => {
     return (
         <div className="mole-container" onClick={handleClick} onTouchStart={handleClick}>
             <div className={`mole ${mode}`}></div>
-            <div className="mole-hole"></div>
+            <div className="mole-hole">
+            <audio ref={whackSoundRef} src="/assets/sounds/whack.mp3"></audio>
+            <audio ref={moleCrySoundRef} src="/assets/sounds/molecry.mp3"></audio>
+            </div>
         </div>
     )
 }
