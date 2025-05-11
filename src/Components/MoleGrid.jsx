@@ -9,12 +9,14 @@ import GameResult from "./GameResult.jsx";
 
 const MoleGrid = () => {
     const {state, dispatch} = useContext(GameContext);
-    const {score, timer, status, gameDuration, difficulty} = state;
+    const {score, timer, status, gameDuration, difficulty, highScorey} = state;
     const [activeMoles, setActiveMoles] = useState(Array(9).fill(false));  
     const timerInterval = useRef(null);
     const moleAppearanceInterval = useRef(null);
     const {backgroundMusicRef} = GameMusic();
     const gameEndSoundRef = useRef(new Audio("/assets/sounds/game-over.mp3"));
+    const [scoreProcessed, setScoreProcessed] = useState(false);
+    const [isNewHighScore, setIsNewHighScore] = useState(false);
     // using the useMemo with the difficulty settings to prevent re-rendering and to select the difficulty settings when neccessary.
     const difficultySettings = useMemo(() => ({
         easy:{
@@ -135,11 +137,54 @@ const MoleGrid = () => {
         }
     }, [dispatch, status])
     
+    // Load HighScores in within the useEffect.
 
+    useEffect(() => {
+        if (status === "ended" && !scoreProcessed && score > 0){
+            // if the status is ended set the highSCore of the game and store it.
+            let highScores = [];
+            localStorage.setItem('highScores', JSON.stringify(highScores));
+            const storedHighScores = localStorage.getItem('highScores');
+            
+            if (storedHighScores) {
+                highScores = JSON.parse(storedHighScores);
+            }
+            
+            const newScore = {
+                score: score,
+                timestamp : Date.now()
+            }
+            
+            highScores.push(newScore);
+
+            highScores.sort((a, b) => b.score - a.score);
+            
+            const isTopScore = highScores.length === 0 || score > (highScores[0]?.score || 0);
+             
+            dispatch({type: "SET_HIGH_SCORES", payload: highScores});
+            setIsNewHighScore(isTopScore);
+            setScoreProcessed(true);
+
+        }   
+    },[status, score, dispatch, scoreProcessed]);
+  
+
+    const loadHighScores = useCallback(() => {
+        const storedHighScores = localStorage.getItem('highScores');
+        if (storedHighScores) {
+            dispatch({ type: 'SET_HIGH_SCORES', payload: JSON.parse(storedHighScores) })
+        }
+    }, [dispatch])
+
+
+    useEffect(() => {
+        loadHighScores();
+
+    }, [loadHighScores])
     const RenderGameResult = () => {
             if(status === "ended"){
             return(
-                <GameResult score={score}/>
+                <GameResult score={score} isNewHighScore={isNewHighScore} highScores={highScorey}/>
             )
         }
     }

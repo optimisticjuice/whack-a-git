@@ -38,7 +38,16 @@ function gameReducer(state, action){
                             }
                     case "RESET_GAME":
                             return initialState;
-                    default:
+
+            case "SET_HIGH_SCORES":
+                return {...state,
+                    highScores: action.payload
+                }
+                case "INCREMENT_SCORE":
+                    return {...state,
+                        score: score + action.payload
+                    }
+                default:
                         return state;
     }
 }

@@ -3,6 +3,6 @@ export const initialState = {
     status:"paused", /* Game status */
     timer: 0, /* Timer */
     difficulty: "easy", /* Game difficulty */
-    gameDuration: 40, /* Game duration */
-    highScores: [] /* High scores */
+    gameDuration: 10, /* Game duration */
+    highScorey: [] /* High scores */
 }

@@ -14,7 +14,7 @@ const Mole = ({onWhack, moleIndex, isActive}) => {
         if(isActive && mode !== "whacked"){
             // IF the mole is not whacked, make it visible
             setMode("visible");
-
+            // moleCrySoundRef is the sound that plays when the mole is not whacked.(in the background)
             if (moleCrySoundRef.current) {
                 moleCrySoundRef.current.volume = 0.5;
                 moleCrySoundRef.current.currentTime = 0;
