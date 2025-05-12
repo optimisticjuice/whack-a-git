@@ -135,6 +135,7 @@ const MoleGrid = () => {
 
             const isTopScore = highScores.length === 0 || score > (highScores[0]?.score || 0);
             setIsNewHighScore(isTopScore);
+
             const newScore = {
                 score: score,
                 timestamp: Date.now()
