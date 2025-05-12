@@ -8,89 +8,79 @@ import GameMusic from "../Hooks/GameLogic";
 import GameResult from "./GameResult.jsx";
 
 const MoleGrid = () => {
-    const {state, dispatch} = useContext(GameContext);
-    const {score, timer, status, gameDuration, difficulty, highScorey} = state;
-    const [activeMoles, setActiveMoles] = useState(Array(9).fill(false));  
+    const { state, dispatch } = useContext(GameContext);
+    const { score, timer, status, gameDuration, difficulty, highScores } = state;
+    const [activeMoles, setActiveMoles] = useState(Array(9).fill(false));
     const timerInterval = useRef(null);
     const moleAppearanceInterval = useRef(null);
-    const {backgroundMusicRef} = GameMusic();
+    const { backgroundMusicRef } = GameMusic();
     const gameEndSoundRef = useRef(new Audio("/assets/sounds/game-over.mp3"));
     const [scoreProcessed, setScoreProcessed] = useState(false);
     const [isNewHighScore, setIsNewHighScore] = useState(false);
-    // using the useMemo with the difficulty settings to prevent re-rendering and to select the difficulty settings when neccessary.
     const difficultySettings = useMemo(() => ({
-        easy:{
+        easy: {
             moleShowTime: 1200,
             moleAppearanceRate: 2000,
             moleActiveMoles: 2
         },
-        medium:{
+        medium: {
             moleShowTime: 800,
             moleAppearanceRate: 1500,
             moleActiveMoles: 3
         },
-        difficult:{
+        difficult: {
             moleShowTime: 300,
             moleAppearanceRate: 700,
             moleActiveMoles: 4
         },
-    }),[])
+    }), [])
 
     const currentSettings = useMemo(() => difficultySettings[difficulty], [difficulty, difficultySettings])
-    
-    //  Start the game timer  and set the gameDuration in motion.
+
     useEffect(() => {
-        if(status === "playing" && timer === 0){
+        if (status === "playing" && timer === 0) {
             gameEndSoundRef.current.play().catch(error => {
                 console.error("Failed to play game over sound", error);
             });
-            dispatch({type: "END_GAME"});
-            dispatch({type: "SET_TIMER", payload: gameDuration});
+            dispatch({ type: "END_GAME" });
+            dispatch({ type: "SET_TIMER", payload: gameDuration });
         }
-        if(status === "playing" && timer > 0){
-            timerInterval.current = setInterval(() =>{
-                dispatch({type: "DECREMENT_TIMER"})
+        if (status === "playing" && timer > 0) {
+            timerInterval.current = setInterval(() => {
+                dispatch({ type: "DECREMENT_TIMER" })
             }, 1000);
-        }else if(status ==="paused" || status !== "playing"){
+        } else if (status === "paused" || status !== "playing") {
             clearInterval(timerInterval.current);
-            // pause the game whilst it is not playing.
         }
         return () => clearInterval(timerInterval.current);
     }, [dispatch, status, timer, gameDuration]);
 
 
-    
+
     useEffect(() => {// This useEffect is for the background music 
-        if(status === "playing" && backgroundMusicRef.current){
-            backgroundMusicRef.current.play().catch(error =>{
+        if (status === "playing" && backgroundMusicRef.current) {
+            backgroundMusicRef.current.play().catch(error => {
                 console.error("Failed to play background music", error);
-                // condition to play music in the background else set an error condition.
             });
-        }else if((status === "paused") && backgroundMusicRef.current){
+        } else if ((status === "paused") && backgroundMusicRef.current) {
             backgroundMusicRef.current.pause();
-            // condition to pause the music when the game is paused.
         }
-        if((status === "ended") && backgroundMusicRef.current){
+        if ((status === "ended") && backgroundMusicRef.current) {
             backgroundMusicRef.current.currentTime = 0;
             backgroundMusicRef.current.pause();
-            // condition to reset the music when the game is ended.
         }
     }, [status, backgroundMusicRef])
-    
-    
 
-    
     useEffect(() => {
-        // This is the interval in which the moles will pop up. 
         moleAppearanceInterval.current = setInterval(() => {
             setActiveMoles(prev => {
                 const newActiveMoles = [...prev];
                 const activeCount = newActiveMoles.filter(Boolean).length;
-                
-                if(activeCount >= currentSettings.moleActiveMoles){
+
+                if (activeCount >= currentSettings.moleActiveMoles) {
                     return newActiveMoles;
                 }
-                const availableHoles = newActiveMoles.map((active, index) => ({active,index})).filter(hole => !hole.active).map(hole => hole.index);
+                const availableHoles = newActiveMoles.map((active, index) => ({ active, index })).filter(hole => !hole.active).map(hole => hole.index);
 
                 if (availableHoles.length > 0) {
 
@@ -106,15 +96,15 @@ const MoleGrid = () => {
                         })
                     }, currentSettings.moleShowTime);
                 }
-                
+
                 return newActiveMoles;
-                
+
             })
             return () => clearInterval(moleAppearanceInterval.current);
         }, currentSettings.moleAppearanceRate);
-        
-        
-        if(status !== "playing"){
+
+
+        if (status !== "playing") {
             setActiveMoles(Array(9).fill(false));
             clearInterval(moleAppearanceInterval.current);
             return;
@@ -123,51 +113,44 @@ const MoleGrid = () => {
 
     }, [currentSettings, status])
 
-
-    const handleWhack = useCallback((index) =>{
-        if(status === 'playing'){
-            dispatch({type: "INCREMENT_SCORE", payload: 1});
-            // Increment the score by 1 everytime the mole is whacked 
-            setActiveMoles(prev =>{
+    const handleWhack = useCallback((index) => {
+        if (status === 'playing') {
+            dispatch({ type: "INCREMENT_SCORE", payload: 1 });
+            setActiveMoles(prev => {
                 const newActiveMoles = [...prev];
                 newActiveMoles[index] = false;
                 return newActiveMoles;
             })
-            // The setActiveMoles will set the true to false of the mole that was whacked so that the mole that is whacked is now hidden(false).
         }
     }, [dispatch, status])
-    
-    // Load HighScores in within the useEffect.
 
     useEffect(() => {
-        if (status === "ended" && !scoreProcessed && score > 0){
-            // if the status is ended set the highSCore of the game and store it.
+        if (status === "ended" && !scoreProcessed && score > 0) {
             let highScores = [];
-            localStorage.setItem('highScores', JSON.stringify(highScores));
             const storedHighScores = localStorage.getItem('highScores');
-            
+
             if (storedHighScores) {
                 highScores = JSON.parse(storedHighScores);
             }
-            
+
+            const isTopScore = highScores.length === 0 || score > (highScores[0]?.score || 0);
+            setIsNewHighScore(isTopScore);
             const newScore = {
                 score: score,
-                timestamp : Date.now()
+                timestamp: Date.now()
             }
-            
+
             highScores.push(newScore);
 
             highScores.sort((a, b) => b.score - a.score);
-            
-            const isTopScore = highScores.length === 0 || score > (highScores[0]?.score || 0);
-             
-            dispatch({type: "SET_HIGH_SCORES", payload: highScores});
-            setIsNewHighScore(isTopScore);
+
+
+            dispatch({ type: "SET_HIGH_SCORES", payload: highScores });
+            localStorage.setItem('highScores', JSON.stringify(highScores));
             setScoreProcessed(true);
 
-        }   
-    },[status, score, dispatch, scoreProcessed]);
-  
+        }
+    }, [status, score, dispatch, scoreProcessed]);
 
     const loadHighScores = useCallback(() => {
         const storedHighScores = localStorage.getItem('highScores');
@@ -179,44 +162,50 @@ const MoleGrid = () => {
 
     useEffect(() => {
         loadHighScores();
+    }, [loadHighScores]);
 
-    }, [loadHighScores])
+    useEffect(() => {
+        if (status === 'playing') {
+            setScoreProcessed(false);
+        }
+    }, [status]);
+
     const RenderGameResult = () => {
-            if(status === "ended"){
-            return(
-                <GameResult score={score} isNewHighScore={isNewHighScore} highScores={highScorey}/>
+        if (status === "ended") {
+            return (
+                <GameResult score={score} isNewHighScore={isNewHighScore} highScores={highScores} />
             )
         }
     }
     return (
         <div className="game-container">
-            <GameStats score={score} timer={timer}/>
+            <GameStats score={score} timer={timer} />
             {/* The GameStats component was added to the ui */}
             {/* Meaning it will display the score and timer */}
             <div className="mole-grid">
                 <div className="moles-row-top">
                     {/* The 3 top moles were added to the ui */}
                     {Array(3).fill().map((_, index) => (
-                        <Mole key={index} moleIndex={index} isActive={activeMoles[index]} onWhack={handleWhack}/>
+                        <Mole key={index} moleIndex={index} isActive={activeMoles[index]} onWhack={handleWhack} />
                     ))}
                 </div>
                 <div className="moles-row-middle">
                     {/* The 3 middle moles were added to the ui */}
                     {Array(3).fill().map((_, index) => (
-                        <Mole key={index + 3} moleIndex={index + 3} isActive={activeMoles[index + 3]} onWhack={handleWhack}/>
+                        <Mole key={index + 3} moleIndex={index + 3} isActive={activeMoles[index + 3]} onWhack={handleWhack} />
                     ))}
                 </div>
                 <div className="moles-row">
                     {/* The 3 bottom moles were added to the ui */}
                     {Array(3).fill().map((_, index) => (
-                        <Mole key={index + 6} moleIndex={index + 6} isActive={activeMoles[index + 6]} onWhack={handleWhack}/>
+                        <Mole key={index + 6} moleIndex={index + 6} isActive={activeMoles[index + 6]} onWhack={handleWhack} />
                     ))}
                 </div>
-               
-                
+
+
             </div>
             {/* The GameControls component was added to the ui */}
-            <GameControls/>
+            <GameControls />
             {RenderGameResult()}
         </div>
     )

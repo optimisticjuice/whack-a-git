@@ -1,66 +1,71 @@
-import { useReducer } from "react"; 
+import { useReducer } from "react";
 import { initialState } from "./GameConstants";
-import { GameContext } from "./GameContextDefinition"; 
+import { GameContext } from "./GameContextDefinition";
 
-function gameReducer(state, action){
-    const {gameDuration, status, timer, score} = state;
+function gameReducer(state, action) {
+    const { gameDuration, status, timer, score } = state;
     // note to self no brackets on the state when destructuring.
     // when destructuring the right hand side of the equation does NOT require brackets.
-    switch(action.type){
+    switch (action.type) {
         case "START_GAME":
-            return {...state, 
+            return {
+                ...state,
                 status: "playing",
                 timer: timer > 0 ? timer : gameDuration,
                 score: status === "paused" ? score : 0
             };
-            // When the timer is 0 reset to gameDuration else make the timer decrement as intended
+        // When the timer is 0 reset to gameDuration else make the timer decrement as intended
         case "PAUSE_GAME":
-            return {...state, 
+            return {
+                ...state,
                 status: "paused"
-            }    
-            // When the game is paused, the timer is paused
-            case "SET_DIFFICULTY":
-                return {...state, 
-                    difficulty: action.payload
-                };
-                case "DECREMENT_TIMER":
-                    return {...state, 
-                        timer: timer - 1
-                    };
-                    case "SET_TIMER":
-                        return {...state,
-                            timer: action.payload
-                        }
-                        // The timer is decremented by 1 every second.
-                        case "END_GAME":
-                            return {...state,
-                                status: "ended"
-                            }
-                    case "RESET_GAME":
-                            return initialState;
+            }
+        // When the game is paused, the timer is paused
+        case "SET_DIFFICULTY":
+            return {
+                ...state,
+                difficulty: action.payload
+            };
+        case "DECREMENT_TIMER":
+            return {
+                ...state,
+                timer: timer - 1
+            };
+        case "SET_TIMER":
+            return {
+                ...state,
+                timer: action.payload
+            }
+        // The timer is decremented by 1 every second.
+        case "END_GAME":
+            return {
+                ...state,
+                status: "ended"
+            }
+        case "RESET_GAME":
+            return initialState;
 
-            case "SET_HIGH_SCORES":
-                return {...state,
-                    highScores: action.payload
-                }
-                case "INCREMENT_SCORE":
-                    return {...state,
-                        score: score + action.payload
-                    }
-                default:
-                        return state;
+        case "SET_HIGH_SCORES":
+            return { ...state, highScores: action.payload }
+        case "INCREMENT_SCORE":
+            return {
+                ...state,
+                score: score + action.payload
+            }
+        default:
+            return state;
     }
 }
 
 
 
-export const GameProvider = ({children}) => {
+export const GameProvider = ({ children }) => {
     const [state, dispatch] = useReducer(gameReducer, initialState);
     // useReducer it from the state and dispatch.
-    
+
     return (
         // The GameContext.Provider ensures that the state and dispatch are available to all components in the children.
-        <GameContext.Provider value={{state, dispatch}}>
+        <GameContext.Provider value={{ state, dispatch }}>
             {children}
         </GameContext.Provider>
     );
